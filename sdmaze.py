@@ -2,7 +2,7 @@
 # Author: Ben Brittain
 # Solve puzzles using A*
 
-import sys, heapq, copy
+import sys, heapq, copy, math
 
 class Puzzle():
     '''Stores all associated Board Information'''
@@ -44,7 +44,9 @@ def showSteps(puzzle):
         
 def showSolution(puzzle):
     board = copy.deepcopy(puzzle.puzzle)
+    count = 0
     while puzzle.parent != None:
+        count = count + 1
         board[puzzle.die[0]][puzzle.die[1]] = puzzle.dieO[0]
         puzzle = puzzle.parent
     board[puzzle.die[0]][puzzle.die[1]] = "D"
@@ -53,6 +55,7 @@ def showSolution(puzzle):
     for line in board:
         sumstr= sumstr + "\t" + "".join([str(x) for x in line]) + "\n"
     print sumstr
+    print str(count) + " moves were made" 
 
 def moveDice(puzzle, direction):
     ''' move the die(Tuple) in a direction along a board'''
@@ -83,8 +86,7 @@ def moveDice(puzzle, direction):
     return ((card['t'],card['n'],card['e']),npos)
 
 def successors(puzzle):
-    #convert to lazy list?
-#    puzzles = []
+    ''' generates successors for a dice roll in each cardinal direction, returns puzzle'''
     for cardDirection in range(0,4):
         ori, pos = moveDice(puzzle, cardDirection)
         if pos != None:
@@ -95,10 +97,9 @@ def successors(puzzle):
                 npuzzle.dieO = ori
                 npuzzle.die = pos
                 yield npuzzle
-#                puzzles.append(npuzzle)
-#    return puzzles
 
-def aStar(puzzle,hueristic):
+def aStar(puzzle,heuristic):
+    '''A* takes a puzzle & heuristic, return solved puzzle & node generation info'''
     node = (puzzle.cost, puzzle)
     frontier = [node]
     heapq.heapify(frontier) #unecessary, remove?
@@ -109,17 +110,14 @@ def aStar(puzzle,hueristic):
             return None
         popped = heapq.heappop(frontier)
         node = popped[1]
-        #print node
         cost = popped[0]
         if goalState(node):
-            return node
+            return node, len(explored)
         explored.append((node.die,node.dieO))
         for neighbor in successors(node):
             if (neighbor.die,neighbor.dieO) not in explored:
-    #           if not neighbor in frontier:
-                 heapq.heappush(frontier,(neighbor.cost, neighbor))
-            #replace node, maybe modify PriorityQueue?
-            # hashmap?
+                cost = heuristic(neighbor) + neighbor.cost
+                heapq.heappush(frontier,(cost, neighbor))
 
 def readPuzzle(fin):
     '''Read in the file & create a Puzzle Object'''
@@ -144,6 +142,39 @@ def readPuzzle(fin):
         raise "Invalid File"
     return Puzzle(puzzle,start,goal)
 
+def manhattanCost(puzzle):
+    die = puzzle.die
+    goal= puzzle.goal
+    cost = abs(goal[1] - die[1]) + abs(goal[0] - die[0])
+    return cost
+
+def directCost(puzzle):
+    die = puzzle.die
+    goal= puzzle.goal
+    cost = math.sqrt((goal[1] - die[1])**2 + (goal[0] - die[0])**2)
+    return cost
+
+def diagManhattan(puzzle):
+    ''' try forcing it in the diagonal direction'''
+    die = puzzle.die
+    goal= puzzle.goal
+    x = abs(die[1]-goal[1]);
+    y = abs(die[0]-goal[0]);
+    if(x > y):
+        return (3/2)*y + (x - y)
+    else:
+        return (3/2)*x + (y - x)
+
+def rowColCost(puzzle):
+    die = puzzle.die
+    goal= puzzle.goal
+    if die[0] == goal[0]:
+        return abs(goal[0]-goal[0])
+    elif die[1] == goal[1]:
+        return abs(goal[1]-goal[1])
+    else:
+        return 0
+
 def main():
     if len(sys.argv) != 2:
         print("Please specify an input file")        
@@ -153,10 +184,21 @@ def main():
     puzzle = readPuzzle(fin)
     print puzzle
     print("\n----- Initializing A* -----\n")
+    # UCS
     solved = aStar(puzzle, lambda x: 0)
+    # Manhattan Distance
+#    solved = aStar(puzzle, manhattanCost)
+    # Direct Cost
+#    solved = aStar(puzzle, directCost)
+    # Diag Manhattan
+#   solved = aStar(puzzle, diagManhattan)
+#   row Col Cost
+    solved = aStar(puzzle, rowColCost)
+    solved,searched= solved
     if solved != None:
         showSteps(solved)
-    print "Add node generation output"
+    print str(searched) + " nodes were generated"
+#    print str(frontier) + " nodes were not expanded"
     print("\n----- Completed A* -----\n")
     if solved == None:
         print "No Solution Found"
