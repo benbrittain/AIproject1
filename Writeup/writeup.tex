@@ -1,0 +1,29 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\title{A* Project Write-Up}
+\author{Ben Cohen and Ben Brittain}
+
+\begin{document}
+\maketitle
+\section*{Problem Definition}
+We define this search problem as attempting to find the optimal path to roll a die through a maze from a pre-defined start to a pre-defined end.   
+\subsection*{States}
+We define a state description as a representation of the board with indication of where the start node is, the end node is, and where the die is, as well as information about the orientation of the die.  For simplicity, our program outputs state descriptions as a nxm grid of "."s (empty passable nodes),"*"s (empty, unpassable nodes), one "S" signifying the start state, one "G" signifying the goal state, and one number, signifying the die, as well as the number currently on top of it.  
+\subsection*{Initial State}Our initial state is marked with an "S" in the maze. 
+\subsection*{Actions}Our set of possible actions is simply defined as rotating our die 90 degrees in each of the cardinal directions.  
+\subsection*{Transition Function} Our transition function is defined as follows: 
+board[row][col] x rollEast() = board[row][col+1] (provided col is not equal to the number of colums in the board [ie. the rightmost row], in which case rollEast() is an invalid action)\\\\
+board[row][col] x rollNorth() = board[row+1][col] (provided row is not equal to zero [ie. the top row], in which case rollNorth() is an invalid action)\\\\
+board[row][col] x rollSouth() = board[row-1][col] (provided row is not equal to the number of rows in the board [ie. the bottom row], in which case rollSouth() is an invalid action)\\\\
+board[row][col] x rollWest() = board[row][col-1] (provided col is not equal tozero [ie. the leftmost row], in which case rollEast() is an invalid action)
+\subsection*{Goal State}
+Our Goal state is simply defined as the node marked with a "G" on our board.  
+\section*{Heuristics}
+For our project we implemented three different heuristics: Manhattan Distance, Direct Cost, and Diagonal Manhattan Distance.  Below are descriptions of, as well as arguements for the validity of these three heuristics.
+\subsection*{Manhattan Distance}
+The Manhattan distance is simply the minimum number of moves from the current state to the goal state, disregarding all rules regarding die orientation, as well as walls.  This number is guarenteed to be less than or equal to the actual minimum number of moves (ie. following the rules).  Consider the below cases:\\
+Case 1: The moves considered without paying attention to the rules are the same moves that would be made while considering the rules.  In this case, the two numbers are equal, meaning the heuristic is valid.\\
+Case 2: The number of moves estimated considers an "illegal" move, meaning that in reality more than one legal move would have to be made to get to that state.  This means that our estimate will be lower than the actual number, making it an admissable heuristic.\\
+As we have seen, this heuristic essentially makes it an easier problems, meaning that the estimate will always be less than or equal to the actual number.  
+\end{document}

@@ -185,25 +185,20 @@ def main():
     print puzzle
     print("\n----- Initializing A* -----\n")
     # UCS
-    solved = aStar(puzzle, lambda x: 0)
-    # Manhattan Distance
-#    solved = aStar(puzzle, manhattanCost)
-    # Direct Cost
-#    solved = aStar(puzzle, directCost)
-    # Diag Manhattan
-#   solved = aStar(puzzle, diagManhattan)
-#   row Col Cost
-    solved = aStar(puzzle, rowColCost)
-    solved,searched= solved
-    if solved != None:
-        showSteps(solved)
-    print str(searched) + " nodes were generated"
-#    print str(frontier) + " nodes were not expanded"
-    print("\n----- Completed A* -----\n")
-    if solved == None:
-        print "No Solution Found"
-        return
-    else:
-        showSolution(solved)
+    heuristics={"Manhattan Cost":manhattanCost,"Direct Cost":directCost,"Diagonal Manhattan Cost":diagManhattan}
+    for h in heuristics:
+        print "Heuristic = "+str(h)
+        solved = aStar(puzzle, heuristics[h])
+        solved,searched= solved
+        if solved != None:
+            showSteps(solved)
+        print str(searched) + " nodes were generated"
+    #    print str(frontier) + " nodes were not expanded"
+        print("\n----- Completed A* -----\n")
+        if solved == None:
+            print "No Solution Found"
+            continue
+        else:
+            showSolution(solved)
 
 main()
