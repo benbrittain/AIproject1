@@ -26,4 +26,20 @@ The Manhattan distance is simply the minimum number of moves from the current st
 Case 1: The moves considered without paying attention to the rules are the same moves that would be made while considering the rules.  In this case, the two numbers are equal, meaning the heuristic is valid.\\
 Case 2: The number of moves estimated considers an "illegal" move, meaning that in reality more than one legal move would have to be made to get to that state.  This means that our estimate will be lower than the actual number, making it an admissable heuristic.\\
 As we have seen, this heuristic essentially makes it an easier problems, meaning that the estimate will always be less than or equal to the actual number.  
+\subsection*{Direct Cost (Euclidian Distance)}
+This is perhaps our simplest heuristic.  All this does is examine the straight line distance between two points using the pythagorean theorum.  This is valid because the shortest distance between two points is a straight line, so this heuristic always provides an optomistic estimation, as the best our die can do is go in a straight line.
+
+\section*{Performance}
+\begin{center}
+    \begin{tabular}{ | l | l | l | }
+    \hline
+    Puzzle & Nodes Generated & Nodes Visited  \\ \hline
+    Puzzle1 & 11C & 22C   \\ \hline
+    Puzzle2 & 9C & 19C  \\ \hline
+    Puzzle3 & 10C & 21C \\ \hline
+    Puzzle4 & 10C & 21C \\ \hline
+    Puzzle5 & 10C & 21C \\ \hline
+
+    \end{tabular}
+\end{center}
 \end{document}
