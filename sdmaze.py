@@ -114,9 +114,9 @@ def aStar(puzzle,heuristic):
         popped = heapq.heappop(frontier)
         node = popped[1]
         cost = popped[0]
-        print("-------------------------------")
-        print node
-        print cost
+        #print("-------------------------------")
+        #print node
+        #print cost
         if goalState(node):
             return node, len(explored)
         explored.append((node.die,node.dieO))
@@ -173,9 +173,9 @@ def test2(puzzle):
     else:
         return xDistance
 def testHeuristic(puzzle):
-    print("****** start ********")
+    #print("****** start ********")
     puzzle = copy.deepcopy(puzzle)
-    print puzzle
+    #print puzzle
     goal = puzzle.goal
     die = puzzle.die
 #    print "start Location: ", puzzle.die
@@ -332,14 +332,14 @@ def main():
     puzzle = readPuzzle(fin)
     print puzzle
     print("\n----- Initializing A* -----\n")
-    heuristics ={"Goal Bias": goalBias, "Close Col & Row": closeColRow, "Direct Cost": lambda x: 0} 
-    heuristics ={"Goal Bias": goalBias}
+    heuristics ={"Goal Bias": goalBias, "Manhattan": manhattanCost, "Direct Cost": lambda x: 0} 
     for h in heuristics:
         print "Heuristic = "+str(h)
         solved = aStar(puzzle, heuristics[h])
         solved,searched= solved
         if solved != None:
-            showSteps(solved)
+            #showSteps(solved)
+            pass
         print str(searched) + " nodes were generated"
     #    print str(frontier) + " nodes were not expanded"
         print("\n----- Completed A* -----\n")
@@ -347,6 +347,7 @@ def main():
             print "No Solution Found"
             continue
         else:
-            showSolution(solved)
+            pass
+            #showSolution(solved)
 
 main()

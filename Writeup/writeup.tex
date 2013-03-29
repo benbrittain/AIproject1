@@ -23,23 +23,28 @@ Our Goal state is simply defined as the node marked with a "G" on our board.
 For our project we implemented three different heuristics: Manhattan Distance, Direct Cost, and Diagonal Manhattan Distance.  Below are descriptions of, as well as arguements for the validity of these three heuristics.
 \subsection*{Manhattan Distance}
 The Manhattan distance is simply the minimum number of moves from the current state to the goal state, disregarding all rules regarding die orientation, as well as walls.  This number is guarenteed to be less than or equal to the actual minimum number of moves (ie. following the rules).  Consider the below cases:\\
-Case 1: The moves considered without paying attention to the rules are the same moves that would be made while considering the rules.  In this case, the two numbers are equal, meaning the heuristic is valid.\\
-Case 2: The number of moves estimated considers an "illegal" move, meaning that in reality more than one legal move would have to be made to get to that state.  This means that our estimate will be lower than the actual number, making it an admissable heuristic.\\
-As we have seen, this heuristic essentially makes it an easier problems, meaning that the estimate will always be less than or equal to the actual number.  
+\textbf{Case 1:} The moves considered without paying attention to the rules are the same moves that would be made while considering the rules.  In this case, the two numbers are equal, meaning the heuristic is valid.\\
+\textbf{Case 2:}The number of moves estimated considers an "illegal" move, meaning that in reality more than one legal move would have to be made to get to that state.  This means that our estimate will be lower than the actual number, making it an admissable heuristic.\\\\
+As we have seen, this heuristic essentially makes it an easier problem, meaning that the estimate will always be less than or equal to the actual number.  
 \subsection*{Direct Cost (Euclidian Distance)}
 This is perhaps our simplest heuristic.  All this does is examine the straight line distance between two points using the pythagorean theorum.  This is valid because the shortest distance between two points is a straight line, so this heuristic always provides an optomistic estimation, as the best our die can do is go in a straight line.
 
 \section*{Performance}
 \begin{center}
-    \begin{tabular}{ | l | l | l | }
+    \begin{tabular}{ | l | l | l |l|l|l}
     \hline
-    Puzzle & Nodes Generated & Nodes Visited  \\ \hline
-    Puzzle1 & 11C & 22C   \\ \hline
-    Puzzle2 & 9C & 19C  \\ \hline
-    Puzzle3 & 10C & 21C \\ \hline
-    Puzzle4 & 10C & 21C \\ \hline
-    Puzzle5 & 10C & 21C \\ \hline
+      &   Goal Bias &  Manhattan  & Euclidian Distance & Nodes Visited  \\ \hline
+    Puzzle1 & 7 & 13&21&6  \\ \hline
+    Puzzle2 & 43 & 58&99&16  \\ \hline
+    Puzzle3 & BAD & BAD&BAD&BAD \\ \hline
+    Puzzle4 & 65 & 93&158&21 \\ \hline
+    Puzzle5 & 265 & 811&4751&26 \\ \hline
 
     \end{tabular}
 \end{center}
+
+\section*{Discussion}
+Our results were about as we expected them to turn out.  Our "Goal Bias" heursistic was the one we spent the most time crafting, and not surprisingly it performed much better than the rest, especially with Maze 5.  Additionally, the Euclidian Distance was the easiest to implement, as well as the simplest, so it's not surprising that it performs rather poorly, especially in a puzzle like this where there are more factors than position (ie. die orientation and walls) to take into account.  The Manhattan distance performed alright, and was very close to the "Goal Bias" heuristic in the smaller puzzles.  \\\\
+Another thing which is interesting to note is the convergence between the nodes generated for the Manhattan cost and the goal bias heuristics as the number of walls in the maze went up.  We found that the goal bias was most accurate in mostly empty mazes, however peformance slowed down signifigantly when obstacles were added.  If we were implementing this to be used on larger mazes, something to consider would be to check the number of walls in a maze, and pick a heuristic based on that.  This way, something like goal bias can be applied where it is sucessful, but can be replaced by a different heuristic when it's not as optimal.  
+
 \end{document}
