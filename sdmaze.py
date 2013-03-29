@@ -319,7 +319,9 @@ def goalBias(puzzle):
         #if inline with the goal with possible roll. (extend for 3,2,1)
         return xDistance
     else:
-        return xDistance + yDistance +1
+        # If none of those are true, manhattan distance plus a minimum of 2 rolls to align with goal
+        # I think...
+        return xDistance + yDistance + 1
 
 def main():
     if len(sys.argv) != 2:
@@ -330,14 +332,8 @@ def main():
     puzzle = readPuzzle(fin)
     print puzzle
     print("\n----- Initializing A* -----\n")
-    heuristics = {"Direct Cost":lambda x: 0}
-    #heuristics={"test":closeColRow}
-    ## CLEAR THESE. TESTING ONLY ##
-    heuristics ={"Goal Bias": goalBias, "Close Col & Row": closeColRow}
-#    puzzle.dieO = (3,6,5)
-#    puzzle.die = (1,2)
-    
-    ##
+    heuristics ={"Goal Bias": goalBias, "Close Col & Row": closeColRow, "Direct Cost": lambda x: 0} 
+    heuristics ={"Goal Bias": goalBias}
     for h in heuristics:
         print "Heuristic = "+str(h)
         solved = aStar(puzzle, heuristics[h])
