@@ -40,6 +40,8 @@ def showSteps(puzzle):
         puzzle= puzzle.parent
     solution.reverse()
     for x in solution:
+        print x.dieO
+        print x.die
         print x,"\n"
         
 def showSolution(puzzle):
@@ -145,6 +147,30 @@ def readPuzzle(fin):
         raise "Invalid File"
     return Puzzle(puzzle,start,goal)
 
+def newtest(puzzle):
+    puzzle = copy.deepcopy(puzzle)
+    goal = puzzle.goal
+    die = puzzle.die
+    xDistance = abs(goal[1] - die[1])
+    yDistance = abs(goal[0] - die[0])
+    if xDistance < 3:
+        return 0
+    else:
+        return xDistance
+
+def test2(puzzle):
+    #if the x distance is highest,
+    # orientations that go 2453 are better
+    # if y distance is higher
+    puzzle = copy.deepcopy(puzzle)
+    goal = puzzle.goal
+    die = puzzle.die
+    xDistance = abs(goal[1] - die[1])
+    yDistance = abs(goal[0] - die[0])
+    if yDistance < 2:
+        return 0
+    else:
+        return xDistance
 def testHeuristic(puzzle):
     print("****** start ********")
     puzzle = copy.deepcopy(puzzle)
@@ -156,18 +182,22 @@ def testHeuristic(puzzle):
 #    print goal
     cost = 0
     # 0 - North, 1 - South,  2 - East, 3 - West
+    rowCost = 0
+    colCost = 0
     sixGoesUp = False
     barrier = False
+    xDistance = goal[1] - die[1]
+    yDistance = goal[0] - die[0]
     if (goal[0] == die[0]):
 #        print("Dice is in same row as goal!")
         #if it cannot role in that direction, return 0
         rollDie = puzzle.die
         rollDieO = puzzle.dieO
-        xDistance = goal[1] - die[1]
 #        print "xDistance: ", xDistance
         for y in range(0,abs(xDistance)%4):
             print puzzle
             if puzzle.dieO[0] == 6:
+                rowCost + 4
                 sixGoesUp = True
                 break
             if xDistance > 0:
@@ -188,7 +218,6 @@ def testHeuristic(puzzle):
                     puzzle.dieO = rollDieO
         cost = abs(xDistance)
     if (goal[1] == die[1]):
-        yDistance = goal[0] - die[0]
 #        print "yDistance: ", yDistance
         for y in range(0,abs(yDistance)%4):
             print puzzle
@@ -219,7 +248,7 @@ def testHeuristic(puzzle):
 #    print "Six Goes up:", sixGoesUp
     #print "Barrier:", barrier
     if sixGoesUp:
-        cost = cost*2 
+        cost = cost+4
 #    print "Heuristic Cost: ", cost
 #    print("****** end ********")
     return cost
@@ -257,6 +286,40 @@ def rowColCost(puzzle):
     else:
         return 0
 
+def closeColRow(puzzle):
+    goal = puzzle.goal
+    die = puzzle.die
+    xDistance = abs(goal[1] - die[1])
+    yDistance = abs(goal[0] - die[0])
+    if xDistance < 2:
+        return yDistance
+    if yDistance < 2:
+        return xDistance
+    else:
+        return xDistance + yDistance 
+
+def goalBias(puzzle):
+    # Bias towards row/column combinations that allow goal roll
+    goal = puzzle.goal
+    die = puzzle.die
+    dieO = puzzle.dieO
+    xDistance = abs(goal[1] - die[1])
+    yDistance = abs(goal[0] - die[0])
+    if xDistance == 1 and (dieO[2] == 1 or dieO[2] == 6):
+        #if on either side of goal w/ possible roll
+        return yDistance + 1
+    elif xDistance == 0 and dieO[0] == 1 and yDistance%4 == 0:
+        #if inline with the goal with possible roll. (extend for 3,2,1)
+        return yDistance
+    elif yDistance == 1 and (dieO[1] == 1 or dieO[1] == 6):
+        #if above or below goal
+        return xDistance + 1
+    elif yDistance == 0 and dieO[1] == 1 and xDistance%4 == 0:
+        #if inline with the goal with possible roll. (extend for 3,2,1)
+        return xDistance
+    else:
+        return xDistance + yDistance +1
+
 def main():
     if len(sys.argv) != 2:
         print("Please specify an input file")        
@@ -266,9 +329,14 @@ def main():
     puzzle = readPuzzle(fin)
     print puzzle
     print("\n----- Initializing A* -----\n")
-    heuristics={"Manhattan Cost":manhattanCost,"Direct Cost":directCost,"Diagonal Manhattan Cost":diagManhattan}
     heuristics = {"Direct Cost":lambda x: 0}
-#    heuristics={"test":testHeuristic}
+    #heuristics={"test":closeColRow}
+    ## CLEAR THESE. TESTING ONLY ##
+    heuristics ={"Goal Bias": goalBias, "Close Col & Row": closeColRow}
+#    puzzle.dieO = (3,6,5)
+#    puzzle.die = (1,2)
+    
+    ##
     for h in heuristics:
         print "Heuristic = "+str(h)
         solved = aStar(puzzle, heuristics[h])
