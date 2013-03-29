@@ -1,5 +1,6 @@
 # Program: sdmaze.py
 # Author: Ben Brittain
+# Auther: Ben Cohen
 # Solve puzzles using A*
 
 import sys, heapq, copy, math
