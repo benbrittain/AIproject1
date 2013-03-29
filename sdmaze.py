@@ -111,6 +111,9 @@ def aStar(puzzle,heuristic):
         popped = heapq.heappop(frontier)
         node = popped[1]
         cost = popped[0]
+        print("-------------------------------")
+        print node
+        print cost
         if goalState(node):
             return node, len(explored)
         explored.append((node.die,node.dieO))
@@ -141,6 +144,85 @@ def readPuzzle(fin):
     if start < 0 or goal < 0:
         raise "Invalid File"
     return Puzzle(puzzle,start,goal)
+
+def testHeuristic(puzzle):
+    print("****** start ********")
+    puzzle = copy.deepcopy(puzzle)
+    print puzzle
+    goal = puzzle.goal
+    die = puzzle.die
+#    print "start Location: ", puzzle.die
+#    print "start Orientation: ", puzzle.dieO
+#    print goal
+    cost = 0
+    # 0 - North, 1 - South,  2 - East, 3 - West
+    sixGoesUp = False
+    barrier = False
+    if (goal[0] == die[0]):
+#        print("Dice is in same row as goal!")
+        #if it cannot role in that direction, return 0
+        rollDie = puzzle.die
+        rollDieO = puzzle.dieO
+        xDistance = goal[1] - die[1]
+#        print "xDistance: ", xDistance
+        for y in range(0,abs(xDistance)%4):
+            print puzzle
+            if puzzle.dieO[0] == 6:
+                sixGoesUp = True
+                break
+            if xDistance > 0:
+                rollDieO, rollDie = moveDice(puzzle, 2)
+                if rollDie == None:
+                    barrier = True
+                    break
+                else:
+                    puzzle.die = rollDie
+                    puzzle.dieO = rollDieO
+            elif xDistance < 0:
+                rollDieO, rollDie = moveDice(puzzle, 3)
+                if rollDie == None:
+                    barrier = True
+                    break
+                else:
+                    puzzle.die = rollDie
+                    puzzle.dieO = rollDieO
+        cost = abs(xDistance)
+    if (goal[1] == die[1]):
+        yDistance = goal[0] - die[0]
+#        print "yDistance: ", yDistance
+        for y in range(0,abs(yDistance)%4):
+            print puzzle
+            if puzzle.dieO[0] == 6:
+                sixGoesUp = True
+                break
+            if yDistance > 0:
+                rollDieO, rollDie = moveDice(puzzle, 0)
+                if rollDie == None:
+                    barrier = True
+                    break
+                else:
+                    puzzle.die = rollDie
+                    puzzle.dieO = rollDieO
+            elif yDistance < 0:
+                rollDieO, rollDie = moveDice(puzzle, 1)
+                if rollDie == None:
+                    barrier = True
+                    break
+                else:
+                    puzzle.die = rollDie
+                    puzzle.dieO = rollDieO
+        cost = abs(yDistance)
+    else:
+        #else, return manhattan distance
+#        print "Estimating using Manhattan Distance"
+        cost = abs(goal[1] - die[1]) + abs(goal[0] - die[0]) 
+#    print "Six Goes up:", sixGoesUp
+    #print "Barrier:", barrier
+    if sixGoesUp:
+        cost = cost*2 
+#    print "Heuristic Cost: ", cost
+#    print("****** end ********")
+    return cost
 
 def manhattanCost(puzzle):
     die = puzzle.die
@@ -184,8 +266,9 @@ def main():
     puzzle = readPuzzle(fin)
     print puzzle
     print("\n----- Initializing A* -----\n")
-    # UCS
     heuristics={"Manhattan Cost":manhattanCost,"Direct Cost":directCost,"Diagonal Manhattan Cost":diagManhattan}
+    heuristics = {"Direct Cost":lambda x: 0}
+#    heuristics={"test":testHeuristic}
     for h in heuristics:
         print "Heuristic = "+str(h)
         solved = aStar(puzzle, heuristics[h])
