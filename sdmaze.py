@@ -331,23 +331,22 @@ def main():
     print("\n----- Creating Puzzle from Input -----\n")
     puzzle = readPuzzle(fin)
     print puzzle
-    print("\n----- Initializing A* -----\n")
     heuristics ={"Goal Bias": goalBias, "Manhattan": manhattanCost, "Direct Cost": lambda x: 0} 
     for h in heuristics:
+        z = raw_input("Press Enter to continue")
+        print "\n"
+        print("\n----- Initializing A* -----\n")
         print "Heuristic = "+str(h)
         solved = aStar(puzzle, heuristics[h])
         solved,searched= solved
         if solved != None:
-            #showSteps(solved)
             pass
         print str(searched) + " nodes were generated"
-    #    print str(frontier) + " nodes were not expanded"
-        print("\n----- Completed A* -----\n")
         if solved == None:
             print "No Solution Found"
             continue
         else:
-            pass
-            #showSolution(solved)
+            showSolution(solved)
+        print("\n----- Completed A* -----\n")
 
 main()

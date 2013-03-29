@@ -20,7 +20,10 @@ board[row][col] x rollWest() = board[row][col-1] (provided col is not equal toze
 \subsection*{Goal State}
 Our Goal state is simply defined as the node marked with a "G" on our board.  
 \section*{Heuristics}
-For our project we implemented three different heuristics: Manhattan Distance, Direct Cost, and Diagonal Manhattan Distance.  Below are descriptions of, as well as arguements for the validity of these three heuristics.
+For our project we implemented three different heuristics: Manhattan Distance, Direct Cost, and Goal Bias.  Below are descriptions of, as well as arguements for the validity of these three heuristics.
+\subsection*{Goal Bias}
+Goal Bias is the most domain specific of the following implemented heuristics. In an A* search, the better the hueristic is at estimating the actual cost, the less unfruitful nodes that are generated. Manhattan Distance (described below) is an excellent way to predict estimated cost in a 4-movement maze. The additional constraint here, which makes Manhattan Distance unsuitable, is the dice rotation constraints. When at the goal, the dice must have a 1 facing up. In addition, the dice can not have a 6 facing up at all during the entire final maze solution. The Goal Bias solution is to weight the columns/rows that are $\pm 1$ from the goal, assuming that the dice can then be rolled into the goal without deviation. The weighting maintains it's admissibility because it never overestimates the cost. Any position outside of this zone is scored by the manhattan distance $+$ 1. Any dice roll outside the zone will take a minimum of the distance in addition to 1-3 more rolls that make the dice line up with the goal. This strongly prunes the generated states in such a way that the number of nodes often decreases by an order of magnitude. 
+
 \subsection*{Manhattan Distance}
 The Manhattan distance is simply the minimum number of moves from the current state to the goal state, disregarding all rules regarding die orientation, as well as walls.  This number is guarenteed to be less than or equal to the actual minimum number of moves (ie. following the rules).  Consider the below cases:\\
 \textbf{Case 1:} The moves considered without paying attention to the rules are the same moves that would be made while considering the rules.  In this case, the two numbers are equal, meaning the heuristic is valid.\\
